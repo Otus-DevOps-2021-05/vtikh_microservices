@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+  post_db:
+    # env_file:
+    #   - variables.env
+    image: mongo:3.2
+    volumes:
+      - post_db:/data/db
+    networks:
+      - back
+  ui:
+    # env_file:
+    #   - variables.env
+    build: ./ui
+    image: ${DOCKERUSER}/ui:${UI_VER}
+    ports:
+      - ${PORT}:9292/tcp
+    networks:
+      - front
+  post:
+    # env_file:
+    #   - variables.env
+    build: ./post-py
+    image: ${DOCKERUSER}/post:${POST_VER}
+    networks:
+      - back
+      - front
+  comment:
+    # env_file:
+    #   - variables.env
+    build: ./comment
+    image: ${DOCKERUSER}/comment:${COMMENT_VER}
+    networks:
+      - back
+      - front
+
+volumes:
+  post_db:
+
+networks:
+  back:
+  front:

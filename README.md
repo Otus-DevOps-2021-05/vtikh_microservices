@@ -1,6 +1,25 @@
 # vtikh_microservices
 vtikh microservices repository
 
+## ДЗ 13 - docker-4
+
+Кроме запуска контейнеров в разных типах docker-сетей в задании изучается docker-compose.
+
+Для запуска кода необходимо:
+1. установить docker-compose
+2. заполнить файл переменных `src/.env` основываясь на примере.
+3. если необходимо, присоединиться к удаленной docker-machine (см. предыдущие hw)
+4. выполнить:
+
+```
+cd src
+docker-compose up -d
+```
+
+Приложение доступно по адресу хоста, где запущены контейнеры.
+
+
+
 ## ДЗ 12 - docker-3
 
 В задании приложение разбивается на микросервисы
@@ -41,6 +60,26 @@ docker run -d --network=reddit -p 9292:9292 <your-dockerhub-login>/ui:2.0
 - Собран образ docker с приложением
 - Образ проверен на docker-machine и загружен на docker hub
 - Проверено развертывание приложения из образа, загружженого на docker hub
+
+Развертывание docker-machine и подключение к ней:
+```
+yc compute instance create \
+  --name docker-host \
+  --zone ru-central1-a \
+  --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+  --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts,size=15 \
+  --ssh-key ~/.ssh/id_rsa.pub \
+  --core-fraction=5
+
+docker-machine create \
+  --driver generic \
+  --generic-ip-address=<ip> \
+  --generic-ssh-user yc-user \
+  --generic-ssh-key ~/.ssh/id_rsa \
+  docker-host
+
+eval $(docker-machine env docker-host)
+```
 
 Для запуска этого образа:
 ```
