@@ -1,6 +1,58 @@
 # vtikh_microservices
 vtikh microservices repository
 
+## ДЗ 14 - gitlab CI
+
+В задании разворачивается сервер gitlab на ВМ в Я.облаке, который настраивается как дополнительный удаленный репозиторий. В gitlab настраивается пайплайн и окружения.
+
+### Подготовка
+
+Необходимо создать ВМ на ubuntu 18.04 в Я.облаке (2cpu/4RAM), в ней:
+
+```
+mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
+```
+
+разместить в ВМ по пути `srv/gitlab` файл `gitlab-ci/docker-compose.yml`. Запустить контейнер:
+
+```
+docker-compose up -d
+```
+
+### Настройка CI
+
+После успешного развертывания добавить удаленный репозиторий к этому проекту и отправить туда код:
+
+```
+git remote add gitlab http://<gitlab-vm-ip>/homework/example.git
+git push gitlab gitlab-ci-1
+```
+
+Репозиторий уже содержит описание пайплайна `.gitlab-ci.yml`, поэтому требуется настроить только серверную часть. На ВМ-сервере gitlab создать воркер:
+
+```
+sudo docker run -d --name gitlab-runner --restart always -v /srv/gitlab-runner/config:/etc/gitlab-runner -v /var/run/docker.sock:/var/run/docker.sockgitlab/gitlab-runner:latest
+```
+
+и зарегистрировать его:
+
+```
+docker exec -it gitlab-runner gitlab-runner register \
+    --url http://<your-ip>/ \
+    --non-interactive \
+    --locked=false \
+    --name DockerRunner \
+    --executor docker \
+    --docker-image alpine:latest \
+    --registration-token <your-token> \
+    --tag-list "linux,xenial,ubuntu,docker" \
+    --run-untagged
+```
+
+### Окружения
+
+Также в пайплайне `.gitlab-ci.yml` объявлены окружения *dev*, *beta* и *production*. Последние два запускаются вручную.
+
 ## ДЗ 13 - docker-4
 
 Кроме запуска контейнеров в разных типах docker-сетей в задании изучается docker-compose.
