@@ -1,6 +1,58 @@
 # vtikh_microservices
 vtikh microservices repository
 
+## ДЗ 15 - monitoring
+
+Добавляем мониторинг к микросервисному приложению.
+
+Для запуска:
+
+Создаем ВМ
+```
+yc compute instance create \
+  --name docker-host \
+  --zone ru-central1-a \
+  --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+  --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts,size=15 \
+  --ssh-key ~/.ssh/id_rsa.pub
+```
+
+Настроить docker-machine и переключить окружение на нее
+
+```
+docker-machine create \
+  --driver generic \
+  --generic-ip-address=84.201.135.110 \
+  --generic-ssh-user yc-user \
+  --generic-ssh-key ~/.ssh/id_rsa \
+  docker-host
+
+eval $(docker-machine env docker-host)
+```
+
+Cобрать образы приложения:
+
+```
+for i in ui post-py comment; do cd src/$i; bash docker_build.sh; cd -; done
+```
+
+Далее перейти в директорию docker, заполнить файл .env, как показано в примере. Собрать образ prometheus:
+
+```
+export USER_NAME=username
+docker build -t $USER_NAME/prometheus .
+```
+
+Запустить приложение:
+
+```
+docker-compose up -d
+```
+
+Приложение доступно по протоколу http и адресу ВМ на порту 9292. Мониторинг - на 9090
+
+Образы загружены на docker hub: [https://hub.docker.com/u/vtikh](https://hub.docker.com/u/vtikh)
+
 ## ДЗ 13 - docker-4
 
 Кроме запуска контейнеров в разных типах docker-сетей в задании изучается docker-compose.
