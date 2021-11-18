@@ -1,5 +1,58 @@
 # vtikh_microservices
 vtikh microservices repository
+## ДЗ 17 - kubernetes-1
+
+В Я.облаке запущены 2 вм, в каждой из ни:
+
+- установлены необходимые пакеты:
+
+
+```
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo apt update
+sudo apt-get install docker-ce=5:19.03.15~3-0~ubuntu-bionic docker-ce-cli=5:19.03.15~3-0~ubuntu-bionic containerd.io kubelet=1.19.14-00 kubeadm=1.19.15-00 kubectl=1.19.15-00
+```
+
+- на первой (мастер) развернут kubernetes:
+
+```
+kubeadm init --apiserver-cert-extra-sans=<IP> --apiserver-advertise-address=0.0.0.0 --control-plane-endpoint=<IP> --pod-network-cidr=10.128.0.0/24
+```
+
+- вторая подключена к мастер-узлу:
+
+```
+sudo kubeadm join <IP>:6443 --token 9gzb3g.ob9xyzqow7kf4bj4 --discovery-token-ca-cert-hash sha256:07adfcf7e90e162059ac3cc50cc6e18ab6490499d61d70e572fc1174811d1e80
+```
+
+- на мастер узле создана конфигурация
+
+```
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+- скачан и применен манифест Calico:
+
+```
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
+kubectl apply -f calico.yaml
+```
+
+- а также запущен один из подов:
+
+```
+kubectl apply -f ui-deployment.yml
+...
+$ kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+ui-deployment-864cd78b97-jf6fh   1/1     Running   0          95m
+```
+
 
 ## ДЗ 16 - logging-1
 
