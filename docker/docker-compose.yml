@@ -4,6 +4,8 @@ services:
   post_db:
     # env_file:
     #   - variables.env
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     image: mongo:3.2
     volumes:
       - post_db:/data/db
@@ -16,15 +18,24 @@ services:
     # env_file:
     #   - variables.env
     # build: ./ui
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     image: ${DOCKERUSER}/ui:${UI_VER}
     ports:
       - ${PORT}:9292/tcp
     networks:
       - front
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.ui
   post:
     # env_file:
     #   - variables.env
     # build: ./post-py
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     image: ${DOCKERUSER}/post:${POST_VER}
     networks:
       back:
@@ -33,10 +44,17 @@ services:
       front:
         aliases:
           - post
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.post
   comment:
     # env_file:
     #   - variables.env
     # build: ./comment
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     image: ${DOCKERUSER}/comment:${COMMENT_VER}
     networks:
       back:
@@ -46,7 +64,7 @@ services:
         aliases:
           - comment
   prometheus:
-    image: ${USER_NAME}/prometheus
+    image: ${DOCKERUSER}/prometheus
     ports:
       - '9090:9090'
     volumes:

@@ -1,6 +1,44 @@
 # vtikh_microservices
 vtikh microservices repository
 
+## ДЗ 16 - logging-1
+
+Логирование и распределенная трассировка
+
+Запуск новой docker-machine:
+
+```
+yc compute instance create \
+  --name logging --memory 4 \
+  --zone ru-central1-a \
+  --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+  --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts,size=15 \
+  --ssh-key ~/.ssh/id_rsa.pub
+docker-machine create \
+  --driver generic \
+  --generic-ip-address=51.250.5.232 \
+  --generic-ssh-user yc-user \
+  --generic-ssh-key ~/.ssh/id_rsa \
+  logging
+eval $(docker-machine env logging)
+```
+
+Запуск контейнеров:
+
+```
+cd docker
+docker-compose -f docker-compose-logging.yml up -d
+docker-compose up -d
+```
+
+Теперь по белому адресу ВМ работают сервисы:
+
+- kibana: [http://\<ip\>:5601]()
+- zipkin: [http://\<ip\>:9411]()
+- основное веб-приложение: [http://\<ip\>:9292]()
+
+В **kibana** стоит начать с создания индекса. Для этого перейти *Discover > Index Pattern > Create Index Pattern* В поле *Index Pattern* ввести `fluentd-*`, в *Time filter* - `@timestamp` и создать индекс.
+
 ## ДЗ 15 - monitoring
 
 Добавляем мониторинг к микросервисному приложению.
