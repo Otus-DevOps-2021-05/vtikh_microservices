@@ -9,7 +9,16 @@ vtikh microservices repository
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/cloud/deploy.yaml
 ```
 
-Применить манифесты и узнать внешний адрес (external-ip):
+Создать в Я.облаке диск для PersistenVolume БД mongo и получить его id:
+
+```
+yc compute disk create \\n  --name k8s \\n  --size 4 \\n  --description "disk for k8s"
+yc compute disk list
+```
+
+Записать id в файл `kubernetes/reddit/mongo-volume.yml`
+
+Далее применить манифесты для развертывания приложения и узнать его внешний адрес (external-ip):
 
 ```
 kubectl apply -f ./kubernetes/reddit/ -n dev
