@@ -1,5 +1,63 @@
 # vtikh_microservices
 vtikh microservices repository
+
+## ДЗ 18 - kubernetes-2
+
+В ДЗ:
+- манифесты приложения дорабатываются до работоспособного состояния
+- описываются k8s services
+- приложение разворачивается в локальном minicube, а затем в облаке Яндекс (kubernetes managed service)
+
+### Подготовка, развертывание
+
+Для локального развертывания потребуется ВМ с 4 ядрами / 4 ГБ ОЗУ
+Сначала необоходимо установить kubectl:
+
+```
+sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubectl
+
+```
+
+#### minicube
+
+Установить и развернуть так:
+
+```
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+minikube start --kubernetes-version 1.19.7
+kubectl get nodes #проверка
+
+```
+
+#### YC kubernetes managed service
+
+Создать кластер kubernetes в Яндекс Облаке с 2 узлами. Затем:
+
+```
+yc managed-kubernetes cluster get-credentials test-cluster --external
+```
+
+### Деплой приложения
+
+```
+kubectl config current-context
+kubectl apply -f ./kubernetes/reddit/dev-namespace.yml
+kubectl apply -f ./kubernetes/reddit/ -n dev
+```
+
+Определить внешний адрес и порт приложения:
+
+```
+kubectl get nodes -o wide
+kubectl describe service ui -n dev | grep NodePort
+```
+
+После чего его можно открыть в браузере.
+
 ## ДЗ 17 - kubernetes-1
 
 В Я.облаке запущены 2 вм, в каждой из ни:
