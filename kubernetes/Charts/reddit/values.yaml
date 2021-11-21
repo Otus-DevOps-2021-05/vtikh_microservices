@@ -1,0 +1,23 @@
+comment:
+  image:
+    repository: vtikh/comment
+    tag: latest
+  service:
+    externalPort: 9292
+
+post:
+  image:
+    repository: vtikh/post
+    tag: latest
+  service:
+    externalPort: 5000
+
+ui:
+  image:
+    repository: vtikh/ui
+    tag: latest
+  service:
+    externalPort: 9292
+
+mongodb:
+  usePassword: false

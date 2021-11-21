@@ -6,3 +6,8 @@ service:
 image:
   repository: vtikh/ui
   tag: latest
+
+postHost:
+postPort:
+commentHost:
+commentPort:
