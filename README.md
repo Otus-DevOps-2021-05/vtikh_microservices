@@ -1,6 +1,39 @@
 # vtikh_microservices
 vtikh microservices repository
 
+## ДЗ 19 - kubernates-3
+
+Для запуска необходимо развернуть в Я.облаке кластер k8s согласно инструкциям из ДЗ 18. Далее установить Ingress controller:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.34.1/deploy/static/provider/cloud/deploy.yaml
+```
+
+Создать в Я.облаке диск для PersistenVolume БД mongo и получить его id:
+
+```
+yc compute disk create \\n  --name k8s \\n  --size 4 \\n  --description "disk for k8s"
+yc compute disk list
+```
+
+Записать id в файл `kubernetes/reddit/mongo-volume.yml`
+
+Далее применить манифесты для развертывания приложения и узнать его внешний адрес (external-ip):
+
+```
+kubectl apply -f ./kubernetes/reddit/ -n dev
+kubectl get ingress -n dev
+```
+
+Сгенерировать и загрузить в kubernetes сертификат (приложение теперь работает по TLS):
+
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=<external-ip>"
+```
+
+Приложение будет доступно по адресу [https://\<external-ip\>]()
+
+
 ## ДЗ 18 - kubernetes-2
 
 В ДЗ:
